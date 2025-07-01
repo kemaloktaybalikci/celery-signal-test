@@ -18,8 +18,6 @@ def long_task(self):
         for i in range(30):
             time.sleep(1)
             logging.info(f"[TASK PROGRESS] {i + 1}/30 seconds")
-            if i == 5:
-                raise Exception("Simulated failure at 15 seconds")
     except Exception as e:
         logging.error(f"[TASK ERROR] Exception: {str(e)}")
         raise
