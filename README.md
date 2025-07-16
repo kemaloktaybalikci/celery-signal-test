@@ -5,7 +5,7 @@ It runs a long task and lets you test how the worker handles it when you send ea
 
 ---
 
-## Setup
+# Setup for non-containerized test
 
 ### 1. Clone the project or create the files
 
@@ -25,9 +25,11 @@ redis-cli ping
 
 ---
 
-## 🚀 How to Use
+## 🚀 How to Use for non-containerized test
 
 ### 1. Start the Celery worker
+
+Check 'app broker config' on celery file first.
 
 ```bash
 celery -A celery_signal_test worker --loglevel=INFO
@@ -40,9 +42,7 @@ You will see logs from the worker in your terminal.
 Open a new terminal and activate the virtual environment again.
 
 ```bash
-python
->>> from celery_signal_test.tasks import long_task
->>> long_task.delay()
+python run_task.py
 ```
 
 This task takes 30 seconds and prints a log every second.
@@ -79,4 +79,68 @@ To clear Redis data after testing:
 
 ```bash
 redis-cli FLUSHALL
+```
+
+## Setup for Docker Container Test
+
+## 🐳 Docker Usage (Optional)
+
+This project can also run in Docker. Celery and Redis are started in separate containers, allowing you to test signal behavior (`SIGTERM`, `SIGKILL`, etc.) in a containerized environment.
+
+---
+
+### 1. Docker Requirements
+
+Make sure Docker and Docker Compose are installed on your system:  
+👉 https://docs.docker.com/get-docker/
+
+---
+
+### 2. Start the Containers
+
+Check 'app broker config' on celery file first.
+
+In the project root directory:
+
+```bash
+docker-compose up --build
+```
+
+- Redis and Celery containers will start.
+- You can watch the Celery worker logs in the terminal.
+
+---
+
+### 3. Trigger the Task
+
+In the project root directory:
+
+```bash
+docker exec -it celery_worker python run_tasks.py
+```
+
+---
+
+### 4. Sending Signals
+
+#### Graceful shutdown (SIGTERM):
+
+```bash
+docker stop celery_worker
+```
+
+#### Force kill (SIGKILL):
+
+```bash
+docker kill celery_worker
+```
+
+---
+
+### 5. Clean Up
+
+To stop and remove the containers:
+
+```bash
+docker-compose down
 ```
